@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Crochet Studio Cloud</title>
+    <style>
+        :root {
+            --primary: #db2777;
+            --primary-hover: #be185d;
+            --primary-light: #fce7f3;
+            --secondary: #7c3aed;
+            --secondary-light: #f3e8ff;
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 16px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.03);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ENCABEZADO */
+        header {
+            background: #0f172a;
+            color: #ffffff;
+            padding: 12px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .brand-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-subtitle {
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-currency {
+            background: #1e293b;
+            border: 1px solid #334155;
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-currency.active {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .cloud-badge {
+            background: #10b981;
+            color: #ffffff;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* NAVEGACIÓN Y PESTAÑAS */
+        nav {
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 62px;
+            z-index: 30;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 8px;
+            padding: 8px 16px;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .badge {
+            background: #e2e8f0;
+            color: #475569;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+
+        .tab-btn.active .badge {
+            background: var(--primary);
+            color: #ffffff;
+        }
+
+        /* CONTENIDO PRINCIPAL */
+        main {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px 16px;
+            flex: 1;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+
+        .section-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        /* ESTRUCTURA DE LA CALCULADORA */
+        .grid-calculator {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 900px) {
+            .grid-calculator {
+                grid-template-columns: 1.3fr 1fr;
+            }
+        }
+
+        /* TARJETAS */
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 16px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* CAMPOS DE ENTRADA */
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: #f8fafc;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-main);
+            outline: none;
+            transition: border 0.2s;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary);
+            background: #ffffff;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        /* FILAS DINÁMICAS DE MATERIALES */
+        .material-row {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            padding: 10px;
+            border-radius: 12px;
+            display: grid;
+            grid-template-columns: 1fr 80px 90px 30px;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 500px) {
+            .material-row {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .btn-add {
+            width: 100%;
+            padding: 10px;
+            background: var(--primary-light);
+            border: 1px dashed var(--primary);
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 0.8rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-add:hover {
+            background: #fbcfe8;
+        }
+
+        .btn-remove {
+            background: transparent;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-weight: 800;
+            font-size: 1rem;
+        }
+
+        /* RESUMEN Y VISTA PREVIA DE PRECIOS */
+        .summary-card {
+            position: sticky;
+            top: 130px;
+            background: #ffffff;
+            border: 2px solid var(--primary-light);
+        }
+
+        .progress-bar-bg {
+            height: 10px;
+            width: 100%;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            margin: 8px 0;
+        }
+
+        .progress-mat {
+            background: var(--secondary);
+            height: 100%;
+            transition: width 0.3s;
+        }
+
+        .progress-labor {
+            background: var(--primary);
+            height: 100%;
+            transition: width 0.3s;
+        }
+
+        .price-box {
+            padding: 12px;
+            border-radius: 12px;
+            margin-top: 10px;
+        }
+
+        .box-friends {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+        }
+
+        .box-commercial {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: #ffffff;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 0.9rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(219, 39, 119, 0.3);
+            margin-top: 12px;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.95;
+        }
+
+        /* GRILLAS DE REPOSITORIO E HISTORIAL */
+        .repo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 16px;
+        }
+
+        .item-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .item-tag {
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: #f1f5f9;
+            color: #475569;
+            width: fit-content;
+        }
+
+        .item-price {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-top: 4px;
+        }
+
+        /* MODALES Y NOTIFICACIONES */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .modal {
+            background: #ffffff;
+            border-radius: 20px;
+            max-width: 450px;
+            width: 100%;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-header {
+            background: #0f172a;
+            color: #ffffff;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #0f172a;
+            color: #ffffff;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            box-shadow: var(--shadow-lg);
+            z-index: 200;
+            transition: transform 0.3s, opacity 0.3s;
+        }
+    </style>
+
+    <!-- MÓDULO DE FIREBASE EN LA NUBE -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Configuración de la base de datos
+        const firebaseConfig = typeof __firebase_config !== 'undefined' 
+            ? JSON.parse(__firebase_config) 
+            : { apiKey: "demo-key", authDomain: "demo.firebaseapp.com", projectId: "demo-project" };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'crochet-studio-app';
+
+        window.db = db;
+        window.appId = appId;
+        window.auth = auth;
+
+        // Autenticación inicial segura
+        async function initAuth() {
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                await signInWithCustomToken(auth, __initial_auth_token);
+            } else {
+                await signInAnonymously(auth);
+            }
+        }
+        initAuth();
+
+        // Escuchador de estado de usuario y sincronización de datos
+        onAuthStateChanged(auth, (user) => {
+            if (!user) return;
+            window.currentUser = user;
+
+            // 1. Escuchar Insumos en Tiempo Real
+            const matsRef = collection(db, 'artifacts', appId, 'users', user.uid, 'materials');
+            onSnapshot(matsRef, (snapshot) => {
+                const mats = [];
+                snapshot.forEach(doc => mats.push({ id: doc.id, ...doc.data() }));
+                
+                // Si la nube está vacía, cargar insumos iniciales
+                if (mats.length === 0 && !window.initialLoaded) {
+                    window.initialLoaded = true;
+                    seedInitialData(user.uid);
+                } else {
+                    window.appData.materials = mats;
+                    window.updateAllSelects();
+                    window.renderInventory();
+                    window.calculate();
+                    window.updateBadges();
+                }
+            }, (error) => console.error("Error sincronizando insumos:", error));
+
+            // 2. Escuchar Proyectos en Tiempo Real
+            const projsRef = collection(db, 'artifacts', appId, 'users', user.uid, 'projects');
+            onSnapshot(projsRef, (snapshot) => {
+                const projs = [];
+                snapshot.forEach(doc => projs.push({ id: doc.id, ...doc.data() }));
+                window.appData.projects = projs;
+                window.renderProjects();
+                window.updateBadges();
+            }, (error) => console.error("Error sincronizando proyectos:", error));
+        });
+
+        // Carga de datos por defecto en primera ejecución
+        async function seedInitialData(uid) {
+            const defaults = [
+                { name: 'Tambor Hilo Café', cat: 'Lana / Hilo', color: 'Café', unit: 'gr', qty: 250, cost: 18000 },
+                { name: 'Tambor Hilo Secundario', cat: 'Lana / Hilo', color: 'Variado', unit: 'gr', qty: 250, cost: 8000 },
+                { name: 'Algodón Relleno', cat: 'Relleno', color: 'Blanco', unit: 'gr', qty: 250, cost: 5000 },
+                { name: 'Herraje Llavero', cat: 'Accesorio', color: 'Plateado', unit: 'unidades', qty: 1, cost: 2500 }
+            ];
+
+            for (const item of defaults) {
+                const newDocRef = doc(collection(db, 'artifacts', appId, 'users', uid, 'materials'));
+                await setDoc(newDocRef, item);
+            }
+        }
+
+        // Funciones globales expuestas para guardar y eliminar en la nube
+        window.cloudSaveMaterial = async (mat) => {
+            if (!window.currentUser) return;
+            const matRef = doc(collection(db, 'artifacts', appId, 'users', window.currentUser.uid, 'materials'));
+            await setDoc(matRef, mat);
+        };
+
+        window.cloudDeleteMaterial = async (id) => {
+            if (!window.currentUser) return;
+            const matRef = doc(db, 'artifacts', appId, 'users', window.currentUser.uid, 'materials', id);
+            await deleteDoc(matRef);
+        };
+
+        window.cloudSaveProject = async (proj) => {
+            if (!window.currentUser) return;
+            const projRef = doc(collection(db, 'artifacts', appId, 'users', window.currentUser.uid, 'projects'));
+            await setDoc(projRef, proj);
+        };
+    </script>
+</head>
+<body>
+
+    <!-- ENCABEZADO -->
+    <header>
+        <div class="header-container">
+            <div class="brand">
+                <div class="brand-icon">🧶</div>
+                <div>
+                    <div class="brand-title">Crochet Studio</div>
+                    <div class="brand-subtitle">Sincronización Nube Activa</div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="cloud-badge">☁️ En Línea</div>
+                <button onclick="setCurrency('COP')" id="btn-cop" class="btn-currency active">COP</button>
+                <button onclick="setCurrency('USD')" id="btn-usd" class="btn-currency">USD</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- NAVEGACIÓN -->
+    <nav>
+        <div class="nav-container">
+            <button onclick="switchTab('calculator')" id="tab-calculator" class="tab-btn active">
+                📊 Calculadora
+            </button>
+            <button onclick="switchTab('inventory')" id="tab-inventory" class="tab-btn">
+                📦 Insumos <span id="badge-mat" class="badge">0</span>
+            </button>
+            <button onclick="switchTab('projects')" id="tab-projects" class="tab-btn">
+                📁 Proyectos <span id="badge-proj" class="badge">0</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- CONTENIDO -->
+    <main>
+
+        <!-- SECCIÓN 1: CALCULADORA -->
+        <section id="sec-calculator">
+            <div class="section-title">Cotizar Amigurumi</div>
+            <div class="section-subtitle">Calcula el costo real e ingresa tu tiempo. Sincronizado automáticamente.</div>
+
+            <div class="grid-calculator">
+                <!-- FORMULARIO -->
+                <div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">1. Información General</div>
+                        </div>
+                        <div class="form-group">
+                            <label>Nombre del Amigurumi / Proyecto</label>
+                            <input type="text" id="pName" placeholder="Ej: Mono Amigurumi Llavero">
+                        </div>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Tiempo Tejido</label>
+                                <div class="grid-2">
+                                    <input type="number" id="pHours" value="2" min="0" oninput="calculate()">
+                                    <input type="number" id="pMinutes" value="0" min="0" max="59" oninput="calculate()">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Valor de tu Hora</label>
+                                <input type="number" id="pHourlyRate" value="8000" oninput="calculate()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">2. Insumos Utilizados</div>
+                            <button onclick="openMaterialModal()" style="font-size:0.75rem; color:var(--primary); font-weight:700; background:none; border:none; cursor:pointer;">+ Crear Nuevo</button>
+                        </div>
+                        <div id="materialsRows">
+                            <!-- Filas dinámicas -->
+                        </div>
+                        <button onclick="addMaterialRow()" class="btn-add">+ Agregar Material al Proyecto</button>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">3. Margen Comercial</div>
+                        </div>
+                        <div class="form-group">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                                <label>Ganancia Limpia</label>
+                                <span id="marginVal" style="font-weight:800; color:var(--primary); font-size:0.8rem;">20%</span>
+                            </div>
+                            <input type="range" id="pMargin" min="0" max="100" value="20" oninput="calculate()" style="width:100%;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RESUMEN EN TIEMPO REAL -->
+                <div>
+                    <div class="card summary-card">
+                        <div class="card-header">
+                            <div class="card-title">Desglose de Precio</div>
+                        </div>
+
+                        <div style="font-size:0.75rem; font-weight:700; color:var(--text-muted);">Proporción de Inversión</div>
+                        <div class="progress-bar-bg">
+                            <div id="barMat" class="progress-mat" style="width: 50%;"></div>
+                            <div id="barLabor" class="progress-labor" style="width: 50%;"></div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--text-muted); margin-bottom:12px;">
+                            <span>■ Insumos</span>
+                            <span>■ Mano de Obra</span>
+                        </div>
+
+                        <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:0.85rem;">
+                            <span>Materiales:</span>
+                            <strong id="outMat">$0</strong>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:0.85rem;">
+                            <span>Mano de Obra:</span>
+                            <strong id="outLabor">$0</strong>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:12px; font-size:0.9rem; border-top:1px solid var(--border); padding-top:6px;">
+                            <span>Costo Base:</span>
+                            <strong id="outBase" style="color:var(--primary);">$0</strong>
+                        </div>
+
+                        <div class="price-box box-friends">
+                            <div style="font-size:0.65rem; font-weight:800; color:#475569; text-transform:uppercase;">Precio Amigos</div>
+                            <div id="outFriends" style="font-size:1.2rem; font-weight:800; color:#0f172a;">$0</div>
+                        </div>
+
+                        <div class="price-box box-commercial">
+                            <div style="font-size:0.65rem; font-weight:800; color:#f43f5e; text-transform:uppercase;">Precio Recomendado Público</div>
+                            <div id="outCommercial" style="font-size:1.5rem; font-weight:900; color:#ffffff;">$0</div>
+                        </div>
+
+                        <button onclick="saveProject()" class="btn-primary">Guardar en la Nube</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 2: INVENTARIO DE INSUMOS -->
+        <section id="sec-inventory" class="hidden">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <div>
+                    <div class="section-title">Repositorio de Insumos</div>
+                    <div class="section-subtitle">Tus lanas, tambores y herrajes ordenados de A-Z.</div>
+                </div>
+                <button onclick="openMaterialModal()" class="btn-primary" style="width:auto; padding:8px 16px; margin:0;">+ Nuevo Insumo</button>
+            </div>
+
+            <div class="repo-grid" id="inventoryGrid">
+                <!-- Tarjetas cargadas dinámicamente -->
+            </div>
+        </section>
+
+        <!-- SECCIÓN 3: HISTORIAL DE PROYECTOS -->
+        <section id="sec-projects" class="hidden">
+            <div class="section-title">Historial de Proyectos</div>
+            <div class="section-subtitle">Proyectos cotizados guardados (Ordenados por fecha).</div>
+
+            <div class="repo-grid" id="projectsGrid">
+                <!-- Tarjetas cargadas dinámicamente -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL MATERIAL -->
+    <div id="modalMaterial" class="modal-overlay hidden">
+        <div class="modal">
+            <div class="modal-header">
+                <div style="font-weight:800; font-size:0.9rem;" id="modalTitle">Nuevo Insumo</div>
+                <button onclick="closeMaterialModal()" style="background:none; border:none; color:#fff; font-size:1.2rem; cursor:pointer;">✕</button>
+            </div>
+            <form onsubmit="handleSaveMaterial(event)" class="modal-body">
+                <input type="hidden" id="matId">
+                <div class="form-group">
+                    <label>Nombre del Insumo / Tambor</label>
+                    <input type="text" id="matName" required placeholder="Ej: Tambor Hilo Café">
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Categoría</label>
+                        <select id="matCat">
+                            <option value="Lana / Hilo">Lana / Hilo</option>
+                            <option value="Relleno">Relleno</option>
+                            <option value="Accesorio">Accesorio</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Color</label>
+                        <input type="text" id="matColor" placeholder="Ej: Café">
+                    </div>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Unidad</label>
+                        <select id="matUnit">
+                            <option value="gr">Gramos (gr)</option>
+                            <option value="unidades">Unidades (pz)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Cantidad Total</label>
+                        <input type="number" id="matQty" step="any" required placeholder="Ej: 250">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Costo Pagado ($)</label>
+                    <input type="number" id="matCost" required placeholder="Ej: 18000">
+                </div>
+                <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
+                    <button type="button" onclick="closeMaterialModal()" style="padding:8px 16px; background:#e2e8f0; border:none; border-radius:8px; font-weight:700; cursor:pointer;">Cancelar</button>
+                    <button type="submit" class="btn-primary" style="width:auto; margin:0; padding:8px 16px;">Guardar Insumo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICACIÓN -->
+    <div id="toast" class="toast hidden">Mensaje de notificación</div>
+
+    <script>
+        window.appData = {
+            currency: 'COP',
+            materials: [],
+            projects: []
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            addMaterialRow();
+        });
+
+        // FUNCIONES DE ORDENAMIENTO
+        function getSortedMaterials() {
+            return [...window.appData.materials].sort((a, b) => 
+                (a.name || '').localeCompare((b.name || ''), 'es', { sensitivity: 'base' })
+            );
+        }
+
+        function getSortedProjects() {
+            return [...window.appData.projects].sort((a, b) => 
+                (b.timestamp || 0) - (a.timestamp || 0)
+            );
+        }
+
+        window.updateBadges = function() {
+            document.getElementById('badge-mat').innerText = window.appData.materials.length;
+            document.getElementById('badge-proj').innerText = window.appData.projects.length;
+        };
+
+        window.setCurrency = function(curr) {
+            window.appData.currency = curr;
+            document.getElementById('btn-cop').className = `btn-currency ${curr === 'COP' ? 'active' : ''}`;
+            document.getElementById('btn-usd').className = `btn-currency ${curr === 'USD' ? 'active' : ''}`;
+            window.calculate();
+            window.renderInventory();
+            window.renderProjects();
+        };
+
+        function formatMoney(val) {
+            if (window.appData.currency === 'USD') return '$' + Number(val).toFixed(2) + ' USD';
+            return '$' + Math.round(val).toLocaleString('es-CO') + ' COP';
+        }
+
+        window.switchTab = function(tab) {
+            document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById(`sec-${tab}`).classList.remove('hidden');
+            document.getElementById(`tab-${tab}`).classList.add('active');
+
+            if(tab === 'inventory') window.renderInventory();
+            if(tab === 'projects') window.renderProjects();
+        };
+
+        // CALCULADORA
+        let rowCounter = 0;
+        window.addMaterialRow = function(selectedId = '', qty = 1) {
+            const container = document.getElementById('materialsRows');
+            const rowId = 'r_' + (++rowCounter);
+            
+            const sortedMats = getSortedMaterials();
+            const div = document.createElement('div');
+            div.className = 'material-row';
+            div.id = rowId;
+            div.innerHTML = `
+                <select class="r-mat" onchange="calculate()">
+                    <option value="">-- Seleccionar --</option>
+                    ${sortedMats.map(m => `<option value="${m.id}" ${m.id === selectedId ? 'selected' : ''}>${m.name} (${m.color})</option>`).join('')}
+                </select>
+                <input type="number" class="r-qty" value="${qty}" min="0" step="any" placeholder="Cant." oninput="calculate()">
+                <div class="r-subtotal" style="font-weight:700; font-size:0.75rem; text-align:right;">$0</div>
+                <button type="button" class="btn-remove" onclick="removeRow('${rowId}')">✕</button>
+            `;
+            container.appendChild(div);
+            window.calculate();
+        };
+
+        window.updateAllSelects = function() {
+            const sortedMats = getSortedMaterials();
+            document.querySelectorAll('.r-mat').forEach(select => {
+                const currentVal = select.value;
+                select.innerHTML = `
+                    <option value="">-- Seleccionar --</option>
+                    ${sortedMats.map(m => `<option value="${m.id}" ${m.id === currentVal ? 'selected' : ''}>${m.name} (${m.color})</option>`).join('')}
+                `;
+            });
+        };
+
+        window.removeRow = function(id) {
+            document.getElementById(id).remove();
+            window.calculate();
+        };
+
+        window.calculate = function() {
+            const hours = parseFloat(document.getElementById('pHours').value) || 0;
+            const minutes = parseFloat(document.getElementById('pMinutes').value) || 0;
+            const rate = parseFloat(document.getElementById('pHourlyRate').value) || 0;
+            const margin = parseFloat(document.getElementById('pMargin').value) || 0;
+
+            document.getElementById('marginVal').innerText = margin + '%';
+
+            const laborTotal = (hours + (minutes / 60)) * rate;
+            let matTotal = 0;
+
+            document.querySelectorAll('.material-row').forEach(row => {
+                const id = row.querySelector('.r-mat').value;
+                const qty = parseFloat(row.querySelector('.r-qty').value) || 0;
+                let sub = 0;
+                if(id) {
+                    const m = window.appData.materials.find(x => x.id === id);
+                    if(m && m.qty > 0) sub = (m.cost / m.qty) * qty;
+                }
+                row.querySelector('.r-subtotal').innerText = formatMoney(sub);
+                matTotal += sub;
+            });
+
+            const base = matTotal + laborTotal;
+            const commercial = base * (1 + (margin / 100));
+
+            const totalSum = matTotal + laborTotal;
+            const matPct = totalSum > 0 ? (matTotal / totalSum) * 100 : 50;
+            document.getElementById('barMat').style.width = matPct + '%';
+            document.getElementById('barLabor').style.width = (100 - matPct) + '%';
+
+            document.getElementById('outMat').innerText = formatMoney(matTotal);
+            document.getElementById('outLabor').innerText = formatMoney(laborTotal);
+            document.getElementById('outBase').innerText = formatMoney(base);
+            document.getElementById('outFriends').innerText = formatMoney(base);
+            document.getElementById('outCommercial').innerText = formatMoney(commercial);
+
+            return { name: document.getElementById('pName').value, hours, minutes, matTotal, laborTotal, base, commercial, margin };
+        };
+
+        window.saveProject = async function() {
+            const data = window.calculate();
+            if(!data.name) {
+                showToast("Ingresa un nombre para el proyecto");
+                return;
+            }
+            const now = new Date();
+            const newProj = { 
+                ...data, 
+                date: now.toLocaleDateString('es-CO', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+                timestamp: now.getTime()
+            };
+
+            await window.cloudSaveProject(newProj);
+            showToast("¡Proyecto guardado en la nube!");
+            window.switchTab('projects');
+        };
+
+        // INVENTARIO
+        window.renderInventory = function() {
+            const grid = document.getElementById('inventoryGrid');
+            const sortedMats = getSortedMaterials();
+
+            grid.innerHTML = sortedMats.map(m => `
+                <div class="item-card">
+                    <div>
+                        <span class="item-tag">${m.cat}</span>
+                        <div style="font-weight:800; font-size:1rem; margin-top:6px;">${m.name}</div>
+                        <div style="font-size:0.75rem; color:var(--text-muted);">Color: ${m.color || 'N/A'}</div>
+                    </div>
+                    <div style="margin-top:12px; border-top:1px solid var(--border); padding-top:8px;">
+                        <div style="font-size:0.75rem; color:var(--text-muted);">Paquete: ${m.qty} ${m.unit} por ${formatMoney(m.cost)}</div>
+                        <div class="item-price">${formatMoney(m.cost / m.qty)} / ${m.unit}</div>
+                    </div>
+                    <button onclick="deleteMaterial('${m.id}')" style="margin-top:8px; background:none; border:none; color:#ef4444; font-size:0.75rem; font-weight:700; cursor:pointer; text-align:left;">Eliminar</button>
+                </div>
+            `).join('');
+        };
+
+        window.openMaterialModal = function() {
+            document.getElementById('modalMaterial').classList.remove('hidden');
+        };
+
+        window.closeMaterialModal = function() {
+            document.getElementById('modalMaterial').classList.add('hidden');
+        };
+
+        window.handleSaveMaterial = async function(e) {
+            e.preventDefault();
+            const newMat = {
+                name: document.getElementById('matName').value.trim(),
+                cat: document.getElementById('matCat').value,
+                color: document.getElementById('matColor').value.trim(),
+                unit: document.getElementById('matUnit').value,
+                qty: parseFloat(document.getElementById('matQty').value),
+                cost: parseFloat(document.getElementById('matCost').value)
+            };
+
+            await window.cloudSaveMaterial(newMat);
+            window.closeMaterialModal();
+            showToast("Insumo guardado en la nube");
+        };
+
+        window.deleteMaterial = async function(id) {
+            await window.cloudDeleteMaterial(id);
+            showToast("Insumo eliminado de la nube");
+        };
+
+        // PROYECTOS
+        window.renderProjects = function() {
+            const grid = document.getElementById('projectsGrid');
+            const sortedProjs = getSortedProjects();
+
+            grid.innerHTML = sortedProjs.map(p => `
+                <div class="item-card">
+                    <div>
+                        <span class="item-tag">${p.date}</span>
+                        <div style="font-weight:800; font-size:1.1rem; margin-top:6px;">${p.name}</div>
+                        <div style="font-size:0.75rem; color:var(--text-muted);">Tiempo: ${p.hours}h ${p.minutes}m</div>
+                    </div>
+                    <div style="margin-top:12px; border-top:1px solid var(--border); padding-top:8px;">
+                        <div style="font-size:0.75rem; color:var(--text-muted);">Costo Base: ${formatMoney(p.base)}</div>
+                        <div class="item-price">Venta: ${formatMoney(p.commercial)}</div>
+                    </div>
+                </div>
+            `).join('');
+        };
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.classList.remove('hidden');
+            setTimeout(() => t.classList.add('hidden'), 2500);
+        }
+    </script>
+</body>
+</html>
