@@ -15,8 +15,8 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background-color: var(--bg-body); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
 
-        /* PANTALLA DE INICIO DE SESIÓN */
-        #auth-screen {
+        /* PANTALLA DE CÓDIGO DE TALLER */
+        #sync-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(135deg, #0f172a, #1e293b);
             display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
@@ -25,7 +25,7 @@
             background: #ffffff; padding: 30px; border-radius: 24px; max-width: 400px; width: 100%; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); text-align: center;
         }
         .auth-card h2 { margin-bottom: 8px; color: var(--primary); }
-        .auth-card p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px; }
+        .auth-card p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5; }
         
         /* ENCABEZADO Y NAVEGACIÓN */
         header { background: #0f172a; color: #ffffff; padding: 12px 20px; position: sticky; top: 0; z-index: 40; }
@@ -62,7 +62,6 @@
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
         .btn-primary { width: 100%; padding: 12px; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: #ffffff; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; margin-top: 10px; }
-        .btn-secondary { width: 100%; padding: 12px; background: #e2e8f0; color: #334155; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; margin-top: 10px; }
         .btn-logout { background: #334155; color: #fff; padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: bold; border: none; cursor: pointer;}
         
         .material-row { background: #f8fafc; border: 1px solid var(--border); padding: 10px; border-radius: 12px; display: grid; grid-template-columns: 1fr 80px 90px 30px; gap: 8px; align-items: center; margin-bottom: 8px; }
@@ -79,35 +78,30 @@
         .modal-header { background: #0f172a; color: #ffffff; padding: 16px 20px; display: flex; justify-content: space-between; font-weight: bold;}
         .modal-body { padding: 20px; }
         
-        .toast { position: fixed; bottom: 20px; right: 20px; background: #0f172a; color: #ffffff; padding: 12px 20px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; z-index: 200; transition: 0.3s; }
+        .toast { position: fixed; bottom: 20px; right: 20px; background: #0f172a; color: #ffffff; padding: 12px 20px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; z-index: 200; transition: transform 0.3s, opacity 0.3s; transform: translateY(100px); opacity: 0;}
+        .toast.show { transform: translateY(0); opacity: 1; }
     </style>
 </head>
 <body>
 
-    <!-- PANTALLA DE INICIO DE SESIÓN -->
-    <div id="auth-screen">
+    <!-- PANTALLA DE CÓDIGO DE TALLER (Reemplaza al login con correo) -->
+    <div id="sync-screen">
         <div class="auth-card">
             <div class="brand-icon" style="margin: 0 auto 10px;">🧶</div>
-            <h2>Crochet Studio Cloud</h2>
-            <p>Accede para sincronizar tus proyectos en todos tus dispositivos.</p>
+            <h2>Conectar Dispositivo</h2>
+            <p>Ingresa un código secreto. Usa este mismo código en tu iPad, Android o PC para sincronizar tus proyectos automáticamente.</p>
             
-            <form id="auth-form" onsubmit="handleAuth(event)">
+            <form onsubmit="handleSyncCode(event)">
                 <div class="form-group">
-                    <label>Correo electrónico</label>
-                    <input type="email" id="auth-email" required placeholder="tu@correo.com">
+                    <label>Código de Taller (Invéntate uno)</label>
+                    <input type="text" id="input-sync-code" required placeholder="Ej: mis-tejidos-2026" style="text-align: center; font-weight: bold; font-size: 1.1rem; letter-spacing: 1px;">
                 </div>
-                <div class="form-group">
-                    <label>Contraseña</label>
-                    <input type="password" id="auth-password" required placeholder="Min 6 caracteres">
-                </div>
-                <button type="submit" class="btn-primary" id="btn-login">Ingresar</button>
-                <button type="button" class="btn-secondary" id="btn-register" onclick="handleRegister()">Crear cuenta nueva</button>
+                <button type="submit" class="btn-primary">Entrar al Taller</button>
             </form>
-            <p id="auth-error" style="color: #ef4444; font-size: 0.75rem; margin-top: 10px; font-weight: bold;"></p>
         </div>
     </div>
 
-    <!-- APLICACIÓN PRINCIPAL (Oculta hasta iniciar sesión) -->
+    <!-- APLICACIÓN PRINCIPAL -->
     <div id="app-screen" class="hidden">
         
         <header>
@@ -120,8 +114,8 @@
                     </div>
                 </div>
                 <div class="header-actions">
-                    <span id="user-email-display" style="font-size: 0.75rem; color: #94a3b8; margin-right: 10px; display: none;"></span>
-                    <button onclick="logout()" class="btn-logout">Cerrar Sesión</button>
+                    <span id="workspace-display" style="font-size: 0.75rem; color: #94a3b8; margin-right: 10px; font-weight:bold;"></span>
+                    <button onclick="disconnectWorkspace()" class="btn-logout" title="Cambiar dispositivo">Desconectar</button>
                 </div>
             </div>
         </header>
@@ -138,7 +132,7 @@
             <!-- CALCULADORA -->
             <section id="sec-calculator">
                 <div class="section-title">Cotizar Amigurumi</div>
-                <div class="section-subtitle">Tus cotizaciones se guardarán de forma segura en tu cuenta.</div>
+                <div class="section-subtitle">Tus cotizaciones se guardarán de forma segura en la nube.</div>
 
                 <div class="grid-calculator">
                     <div>
@@ -146,7 +140,7 @@
                             <div class="card-header">1. Información General</div>
                             <div class="form-group">
                                 <label>Nombre del Amigurumi / Proyecto</label>
-                                <input type="text" id="pName" placeholder="Ej: Mono Amigurumi Llavero">
+                                <input type="text" id="pName" placeholder="Ej: Oso Amigurumi">
                             </div>
                             <div class="grid-2">
                                 <div class="form-group">
@@ -157,7 +151,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label>Valor de tu Hora ($)</label>
+                                    <label>Valor de tu Hora ($ COP)</label>
                                     <input type="number" id="pHourlyRate" value="8000" oninput="calculate()">
                                 </div>
                             </div>
@@ -169,7 +163,7 @@
                                 <button onclick="openMaterialModal()" style="font-size:0.75rem; color:var(--primary); font-weight:700; background:none; border:none; cursor:pointer;">+ Crear Insumo</button>
                             </div>
                             <div id="materialsRows"></div>
-                            <button onclick="addMaterialRow()" class="btn-add">+ Agregar Insumo</button>
+                            <button onclick="addMaterialRow()" class="btn-add">+ Agregar Insumo a este proyecto</button>
                         </div>
 
                         <div class="card">
@@ -185,7 +179,7 @@
                     </div>
 
                     <div>
-                        <div class="card summary-card" style="position: sticky; top: 130px; border: 2px solid var(--primary-light);">
+                        <div class="card summary-card">
                             <div class="card-header">Desglose de Precio</div>
                             
                             <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:0.85rem;">
@@ -199,7 +193,7 @@
                             </div>
 
                             <div style="background: #f1f5f9; padding: 12px; border-radius: 12px; margin-top: 10px;">
-                                <div style="font-size:0.65rem; font-weight:800; color:#475569;">PRECIO AMIGOS</div>
+                                <div style="font-size:0.65rem; font-weight:800; color:#475569;">PRECIO AMIGOS / FAMILIA</div>
                                 <div id="outFriends" style="font-size:1.2rem; font-weight:800; color:#0f172a;">$0</div>
                             </div>
                             <div style="background: linear-gradient(135deg, #0f172a, #1e293b); color: #fff; padding: 12px; border-radius: 12px; margin-top: 10px;">
@@ -238,19 +232,19 @@
                 <button onclick="closeMaterialModal()" style="background:none; border:none; color:#fff; cursor:pointer;">✕</button>
             </div>
             <form onsubmit="handleSaveMaterial(event)" class="modal-body">
-                <div class="form-group"><label>Nombre del Insumo</label><input type="text" id="matName" required></div>
+                <div class="form-group"><label>Nombre del Insumo / Tambor</label><input type="text" id="matName" required placeholder="Ej: Tambor Hilo Café"></div>
                 <div class="grid-2">
                     <div class="form-group"><label>Categoría</label><select id="matCat"><option>Lana / Hilo</option><option>Relleno</option><option>Accesorio</option></select></div>
                     <div class="form-group"><label>Color</label><input type="text" id="matColor"></div>
                 </div>
                 <div class="grid-2">
-                    <div class="form-group"><label>Unidad</label><select id="matUnit"><option value="gr">Gramos</option><option value="unidades">Unidades</option></select></div>
-                    <div class="form-group"><label>Cantidad Total</label><input type="number" id="matQty" step="any" required></div>
+                    <div class="form-group"><label>Unidad de Medida</label><select id="matUnit"><option value="gr">Gramos (gr)</option><option value="unidades">Unidades (pz)</option></select></div>
+                    <div class="form-group"><label>Cantidad Total del Paquete</label><input type="number" id="matQty" step="any" required></div>
                 </div>
-                <div class="form-group"><label>Costo Total ($)</label><input type="number" id="matCost" required></div>
+                <div class="form-group"><label>Costo Total Pagado ($)</label><input type="number" id="matCost" required></div>
                 <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
-                    <button type="button" onclick="closeMaterialModal()" class="btn-secondary" style="width:auto; margin:0; padding:8px 16px;">Cancelar</button>
-                    <button type="submit" class="btn-primary" style="width:auto; margin:0; padding:8px 16px;">Guardar</button>
+                    <button type="button" onclick="closeMaterialModal()" class="btn-secondary" style="width:auto; margin:0; padding:8px 16px; background:#e2e8f0; border:none; border-radius:10px; cursor:pointer; font-weight:bold;">Cancelar</button>
+                    <button type="submit" class="btn-primary" style="width:auto; margin:0; padding:8px 16px;">Guardar Insumo</button>
                 </div>
             </form>
         </div>
@@ -258,126 +252,118 @@
 
     <div id="toast" class="toast hidden">Notificación</div>
 
-    <!-- SCRIPT FIREBASE -->
+    <!-- SCRIPT DE FIREBASE (SIN AUTENTICACIÓN, SOLO BASE DE DATOS) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         // ==========================================
-        // 🔥 PASO 2: PEGA TU FIREBASE CONFIG AQUÍ 🔥
+        // 🔥 PASO ÚNICO: PEGA TU FIREBASE CONFIG AQUÍ 🔥
+        // (Asegúrate que tu base de datos esté en "Modo de Prueba")
         // ==========================================
         const firebaseConfig = {
-            // Reemplaza TODO este bloque con el código que te dio Firebase en el Paso 1
-            apiKey: "TU_API_KEY",
-            authDomain: "TU_PROYECTO.firebaseapp.com",
-            projectId: "TU_PROYECTO",
-            storageBucket: "TU_PROYECTO.appspot.com",
-            messagingSenderId: "TU_ID",
-            appId: "TU_APP_ID"
-        };
+            apiKey: "AIzaSyCe5p70SooMJq_lAnFzcBCN-z0yFHJxs28", 
+            authDomain: "inventario-crochet-ac48a.firebaseapp.com", 
+            projectId: "inventario-crochet-ac48a", 
+            storageBucket: "inventario-crochet-ac48a.firebasestorage.app", 
+            messagingSenderId: "468474576455", 
+            appId: "1:468474576455:web: 15b86427d7652a7451bb62"
+};
         // ==========================================
 
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
         const db = getFirestore(app);
         
-        let currentUserUid = null;
+        let currentWorkspace = localStorage.getItem('crochet_workspace') || null;
         let materialsData = [];
         let projectsData = [];
         let unsubscribeMats = null;
         let unsubscribeProjs = null;
 
-        // --- SISTEMA DE AUTENTICACIÓN ---
-        window.handleAuth = (e) => {
+        // --- SISTEMA DE ESPACIO DE TRABAJO (WORKSPACE) ---
+        window.handleSyncCode = (e) => {
             e.preventDefault();
-            const email = document.getElementById('auth-email').value;
-            const pass = document.getElementById('auth-password').value;
-            signInWithEmailAndPassword(auth, email, pass).catch(err => {
-                document.getElementById('auth-error').innerText = "Error: Correo o contraseña incorrectos.";
-            });
+            const code = document.getElementById('input-sync-code').value.trim().toLowerCase().replace(/\s+/g, '-');
+            if(code.length < 4) return alert("El código debe tener al menos 4 letras/números.");
+            
+            localStorage.setItem('crochet_workspace', code);
+            currentWorkspace = code;
+            initAppScreen();
         };
 
-        window.handleRegister = () => {
-            const email = document.getElementById('auth-email').value;
-            const pass = document.getElementById('auth-password').value;
-            if(pass.length < 6) return alert("La contraseña debe tener mínimo 6 caracteres.");
-            createUserWithEmailAndPassword(auth, email, pass).catch(err => {
-                document.getElementById('auth-error').innerText = "Error al crear cuenta. (Revisa que el correo sea válido).";
-            });
+        window.disconnectWorkspace = () => {
+            localStorage.removeItem('crochet_workspace');
+            if (unsubscribeMats) unsubscribeMats();
+            if (unsubscribeProjs) unsubscribeProjs();
+            document.getElementById('app-screen').classList.add('hidden');
+            document.getElementById('sync-screen').classList.remove('hidden');
         };
 
-        window.logout = () => { signOut(auth); };
+        // --- INICIALIZAR LA APP SI YA HAY UN CÓDIGO ---
+        function initAppScreen() {
+            if(!currentWorkspace) return;
+            
+            document.getElementById('sync-screen').classList.add('hidden');
+            document.getElementById('app-screen').classList.remove('hidden');
+            document.getElementById('workspace-display').innerText = "Taller: " + currentWorkspace;
+            
+            loadCloudData();
+        }
 
-        // --- ESCUCHAR ESTADO DEL USUARIO ---
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                currentUserUid = user.uid;
-                document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('app-screen').classList.remove('hidden');
-                
-                // Mostrar correo en pantalla grande (opcional)
-                if(window.innerWidth > 600) {
-                    document.getElementById('user-email-display').innerText = user.email;
-                    document.getElementById('user-email-display').style.display = 'block';
-                }
-                
-                loadCloudData();
-            } else {
-                currentUserUid = null;
-                document.getElementById('auth-screen').classList.remove('hidden');
-                document.getElementById('app-screen').classList.add('hidden');
-                
-                if (unsubscribeMats) unsubscribeMats();
-                if (unsubscribeProjs) unsubscribeProjs();
-            }
-        });
-
-        // --- CARGAR DATOS DESDE FIRESTORE ---
+        // --- CARGAR DATOS DESDE FIRESTORE EN TIEMPO REAL ---
         function loadCloudData() {
             // Escuchar Insumos
-            unsubscribeMats = onSnapshot(collection(db, 'users', currentUserUid, 'materials'), (snapshot) => {
+            const matsRef = collection(db, 'workspaces', currentWorkspace, 'materials');
+            unsubscribeMats = onSnapshot(matsRef, (snapshot) => {
                 materialsData = [];
                 snapshot.forEach(doc => materialsData.push({ id: doc.id, ...doc.data() }));
-                materialsData.sort((a,b) => a.name.localeCompare(b.name)); // Orden A-Z
+                materialsData.sort((a,b) => a.name.localeCompare(b.name)); // Orden Alfabético
                 
                 document.getElementById('badge-mat').innerText = materialsData.length;
                 window.updateSelects();
                 window.renderInventory();
                 window.calculate();
+            }, (error) => {
+                console.error("Error cargando base de datos. Revisa las reglas de Firestore.", error);
             });
 
             // Escuchar Proyectos
-            unsubscribeProjs = onSnapshot(collection(db, 'users', currentUserUid, 'projects'), (snapshot) => {
+            const projsRef = collection(db, 'workspaces', currentWorkspace, 'projects');
+            unsubscribeProjs = onSnapshot(projsRef, (snapshot) => {
                 projectsData = [];
                 snapshot.forEach(doc => projectsData.push({ id: doc.id, ...doc.data() }));
-                projectsData.sort((a,b) => b.timestamp - a.timestamp); // Orden Fecha Reciente
+                projectsData.sort((a,b) => b.timestamp - a.timestamp); // Más recientes primero
                 
                 document.getElementById('badge-proj').innerText = projectsData.length;
                 window.renderProjects();
             });
         }
 
-        // --- FUNCIONES CLOUD ---
+        // --- FUNCIONES PARA GUARDAR EN LA NUBE ---
         window.saveCloudMaterial = async (mat) => {
             const matId = 'm_' + Date.now();
-            await setDoc(doc(db, 'users', currentUserUid, 'materials', matId), mat);
+            await setDoc(doc(db, 'workspaces', currentWorkspace, 'materials', matId), mat);
         };
 
         window.deleteCloudMaterial = async (id) => {
-            if(confirm("¿Eliminar este insumo?")) {
-                await deleteDoc(doc(db, 'users', currentUserUid, 'materials', id));
-                showToast("Eliminado");
+            if(confirm("¿Seguro que deseas eliminar este insumo?")) {
+                await deleteDoc(doc(db, 'workspaces', currentWorkspace, 'materials', id));
+                showToast("Insumo Eliminado");
             }
         };
 
         window.saveCloudProject = async (proj) => {
             const projId = 'p_' + Date.now();
-            await setDoc(doc(db, 'users', currentUserUid, 'projects', projId), proj);
+            await setDoc(doc(db, 'workspaces', currentWorkspace, 'projects', projId), proj);
         };
 
-        // --- LOGICA DE INTERFAZ (UI) ---
-        function formatMoney(val) { return '$' + Math.round(val).toLocaleString('es-CO') + ' COP'; }
+        // Ejecutar al inicio si el código ya estaba guardado
+        if(currentWorkspace) {
+            initAppScreen();
+        }
+
+        // --- LÓGICA DE INTERFAZ Y CÁLCULOS ---
+        function formatMoney(val) { return '$' + Math.round(val).toLocaleString('es-CO'); }
         
         window.switchTab = (tab) => {
             document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
@@ -409,6 +395,10 @@
                 const val = sel.value;
                 sel.innerHTML = `<option value="">-- Seleccionar --</option>` + materialsData.map(m => `<option value="${m.id}" ${m.id === val ? 'selected' : ''}>${m.name} (${m.color})</option>`).join('');
             });
+            // Asegurar que haya al menos una fila al cargar
+            if(document.getElementById('materialsRows').children.length === 0) {
+                window.addMaterialRow();
+            }
         };
 
         window.calculate = () => {
@@ -448,14 +438,14 @@
 
         window.saveProject = async () => {
             const data = window.calculate();
-            if(!data.name) return showToast("Falta nombre del proyecto");
+            if(!data.name) return showToast("Por favor, ingresa el nombre del proyecto.");
             
             await window.saveCloudProject({ 
                 ...data, 
                 date: new Date().toLocaleDateString('es-CO', { year: 'numeric', month: 'short', day: 'numeric' }), 
                 timestamp: Date.now() 
             });
-            showToast("Proyecto Guardado");
+            showToast("Proyecto Guardado en la Nube");
             document.getElementById('pName').value = '';
             window.switchTab('projects');
         };
@@ -466,12 +456,12 @@
                     <div>
                         <span class="item-tag">${m.cat}</span>
                         <div style="font-weight:800; font-size:1rem; margin-top:6px;">${m.name}</div>
-                        <div style="font-size:0.75rem; color:var(--text-muted);">Color: ${m.color}</div>
+                        <div style="font-size:0.75rem; color:var(--text-muted);">Color: ${m.color || 'N/A'}</div>
                     </div>
                     <div style="margin-top:12px; border-top:1px solid var(--border); padding-top:8px;">
                         <div style="font-size:0.75rem; color:var(--text-muted);">${m.qty} ${m.unit} por ${formatMoney(m.cost)}</div>
                         <div style="font-size:1.1rem; font-weight:800; color:var(--primary); margin-top:4px;">${formatMoney(m.cost / m.qty)} / ${m.unit}</div>
-                        <button onclick="deleteCloudMaterial('${m.id}')" style="background:none; border:none; color:#ef4444; font-size:0.75rem; font-weight:bold; cursor:pointer; margin-top:8px;">Eliminar</button>
+                        <button onclick="deleteCloudMaterial('${m.id}')" style="background:none; border:none; color:#ef4444; font-size:0.75rem; font-weight:bold; cursor:pointer; margin-top:8px; padding:0;">Eliminar</button>
                     </div>
                 </div>
             `).join('');
@@ -486,35 +476,49 @@
                         <div style="font-size:0.75rem; color:var(--text-muted);">Tiempo: ${p.hours}h ${p.minutes}m</div>
                     </div>
                     <div style="margin-top:12px; border-top:1px solid var(--border); padding-top:8px;">
-                        <div style="font-size:0.75rem; color:var(--text-muted);">Costo: ${formatMoney(p.base)}</div>
-                        <div style="font-size:1.1rem; font-weight:800; color:var(--primary); margin-top:4px;">Venta: ${formatMoney(p.commercial)}</div>
+                        <div style="font-size:0.75rem; color:var(--text-muted);">Costo de Producción: ${formatMoney(p.base)}</div>
+                        <div style="font-size:1.1rem; font-weight:800; color:var(--primary); margin-top:4px;">Venta Sugerida: ${formatMoney(p.commercial)}</div>
                     </div>
                 </div>
             `).join('');
         };
 
-        window.openMaterialModal = () => document.getElementById('modalMaterial').classList.remove('hidden');
-        window.closeMaterialModal = () => document.getElementById('modalMaterial').classList.add('hidden');
+        window.openMaterialModal = () => {
+            document.getElementById('modalMaterial').classList.remove('hidden');
+            document.getElementById('matName').focus();
+        };
+        
+        window.closeMaterialModal = () => {
+            document.getElementById('modalMaterial').classList.add('hidden');
+            document.getElementById('matName').value = '';
+            document.getElementById('matColor').value = '';
+            document.getElementById('matQty').value = '';
+            document.getElementById('matCost').value = '';
+        };
         
         window.handleSaveMaterial = async (e) => {
             e.preventDefault();
             await window.saveCloudMaterial({
-                name: document.getElementById('matName').value,
+                name: document.getElementById('matName').value.trim(),
                 cat: document.getElementById('matCat').value,
-                color: document.getElementById('matColor').value,
+                color: document.getElementById('matColor').value.trim(),
                 unit: document.getElementById('matUnit').value,
                 qty: parseFloat(document.getElementById('matQty').value),
                 cost: parseFloat(document.getElementById('matCost').value)
             });
             window.closeMaterialModal();
-            showToast("Insumo guardado");
+            showToast("Insumo guardado correctamente");
         };
 
         function showToast(msg) {
             const t = document.getElementById('toast');
             t.innerText = msg;
             t.classList.remove('hidden');
-            setTimeout(() => t.classList.add('hidden'), 2500);
+            t.classList.add('show');
+            setTimeout(() => {
+                t.classList.remove('show');
+                setTimeout(() => t.classList.add('hidden'), 300); // Dar tiempo a la animación CSS
+            }, 3000);
         }
     </script>
 </body>
